@@ -3,10 +3,13 @@ buildscript {
     repositories {
         google()
         jcenter()
-        url "https://storage.googleapis.com/snap-kit-build/maven"
+        
         maven {
             url 'https://maven.google.com/'
             name 'Google'
+        }
+        maven {
+            url "https://raw.githubusercontent.com/Snap-Kit/release-maven/repo"
         }
     }
 
@@ -37,5 +40,9 @@ repositories {
 
 dependencies {
     compile 'com.facebook.react:react-native:+'
+    implementation([
+           'com.snapchat.kit.sdk:login:1.1.4',
+           'com.snapchat.kit.sdk:core:1.1.4'
+   ])
 }
 

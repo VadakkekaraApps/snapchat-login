@@ -1,5 +1,5 @@
 
-package com.jose2007kj.reactnative;
+package com.jose2007kj.snapkit;
 
 import java.util.Arrays;
 import java.util.Collections;
