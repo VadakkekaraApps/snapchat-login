@@ -28,109 +28,60 @@ public class RNSnapchatLoginModule extends ReactContextBaseJavaModule {
   public RNSnapchatLoginModule(ReactApplicationContext reactContext) {
     super(reactContext);
     this.reactContext = reactContext;
+    //snapkit code
+
+    final LoginStateController.OnLoginStateChangedListener mLoginStateChangedListener =
+    new LoginStateController.OnLoginStateChangedListener() {
+      @Override
+      public void onLoginSucceeded() {
+        Log.d("RNSnapchatLogin","sucesslogged in");
+        sendEvent(getReactApplicationContext(), "LoginSucceeded", null);
+      }
+
+      @Override
+      public void onLoginFailed() {
+        Log.d("RNSnapchatLogin","faildede login");
+        sendEvent(getReactApplicationContext(), "LoginFailed", null);
+
+      }
+
+      @Override
+      public void onLogout() {
+        sendEvent(getReactApplicationContext(), "LogOut", null);
+
+      }
+      
+    };
+
+
+    //ends here
     SnapLogin.getLoginStateController(this.reactContext).addOnLoginStateChangedListener(mLoginStateChangedListener);
     prefs=PreferenceManager.getDefaultSharedPreferences(reactContext);
     
   }
-  final LoginStateController.OnLoginStateChangedListener mLoginStateChangedListener =
-            new LoginStateController.OnLoginStateChangedListener() {
-              @Override
-              public void onLoginSucceeded() {
-                Log.w("RNSnapchatLogin","sucesslogged in");
-                sendEvent(getReactApplicationContext(), "LoginSucceeded", null);
-              }
-
-              @Override
-              public void onLoginFailed() {
-                Log.w("RNSnapchatLogin","faildede login");
-                sendEvent(getReactApplicationContext(), "LoginFailed", null);
-
-              }
-
-              @Override
-              public void onLogout() {
-                sendEvent(getReactApplicationContext(), "LogOut", null);
-
-              }
-            };
-  public void sendEvent(ReactApplicationContext reactContext,
+   public void sendEvent(ReactApplicationContext reactContext,
                         String eventName,
                         @Nullable WritableMap params) {
+                          Log.d("RNSnapchatLogin","inside sendevent");
     reactContext
             .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
             .emit(eventName, params);
 }
   @ReactMethod
-  public void AddChangedLogin() {
-    SnapLogin.getAuthTokenManager(getReactApplicationContext()).startTokenGrant();
+  public void AddChangedLogin(final Promise promise) {
+    Log.d("RNSnapchatLogin","inside AddChangedLogin");
+    try{
+      SnapLogin.getAuthTokenManager(getReactApplicationContext()).startTokenGrant();
+      promise.resolve(true);
+    }catch(Exception e){
+      promise.resolve(false);
+      Log.d("RNSnapchatLogin","inside AddChangedLogin erro "+e.toString());
+      
+
+    }
     
 }
-  // final LoginStateController.OnLoginStateChangedListener mLoginStateChangedListener =
-  //     new LoginStateController.OnLoginStateChangedListener() {
-  //       @Override
-  //       public void onLoginSucceeded() {
-  //           // final WritableMap map1 = Arguments.createMap();   
-  //           // map1.putString("snaponclick", "sucess");                    
-  //           String query = "{me{displayName}}";
-  //           String variables = null;
-  //           SnapLogin.fetchUserData(getReactApplicationContext(), query, null, new FetchUserDataCallback() {
-  //               @Override
-  //               public void onSuccess(@Nullable UserDataResponse userDataResponse) {
-  //                 // final WritableMap map = Arguments.createMap();   
-  //                 if (userDataResponse == null || userDataResponse.getData() == null) {
-  //                   prefs.edit().putString("username","not_set").commit();
-  //                   return;
-  //                   // map.putString("snapUsername", "medata is null");
-                                  
-  //                   // promise.resolve(map);
-  //                   }
 
-  //                   MeData meData = userDataResponse.getData().getMe();
-  //                   if (meData == null) {
-  //                     prefs.edit().putString("username","not_set").commit();
-  //                     return;
-  //                     // map.putString("snapUsername", "medata is not null");
-                                  
-  //                     // promise.resolve(map);
-  //                   }
-  //                   prefs.edit().putString("username",userDataResponse.getData().getMe().getDisplayName()).commit();
-  //                   // map.putString("snapUsername", userDataResponse.getData().getMe().getDisplayName());
-                                  
-  //                   // promise.resolve(map);
-  //                   // mNameTextView.setText(userDataResponse.getData().getMe().getDisplayName());
-
-  //                   // if (meData.getBitmojiData() != null) {
-  //                   //     Glide.with(getContext())
-  //                   //             .load(meData.getBitmojiData().getAvatar())
-  //                   //             .into(mBitmojiImageView);
-  //                   // }
-  //           }
-
-  //           @Override
-  //           public void onFailure(boolean isNetworkError, int statusCode) {
-  //             prefs.edit().putString("username","login_failure").commit();
-  //             // final WritableMap map = Arguments.createMap(); 
-  //             // map.putString("snapUsername", "failure");
-                                  
-  //             //       promise.resolve(map);  
-  //           }
-  //   });
-  //       // promise.resolve(map);
-  //           // Here you could update UI to show login success
-  //       }
-
-  //       @Override
-  //       public void onLoginFailed() {
-  //         prefs.edit().putString("username","login_failure").commit();                
-  //         // promise.resolve(map);
-  //           // Here you could update UI to show login failure
-  //       }
-
-  //       @Override
-  //       public void onLogout() {
-  //           // Here you could update UI to reflect logged out state
-  //       }
-  //   };
   @ReactMethod
   public void isUserLoggedIn(Promise promise) {
     
@@ -145,76 +96,38 @@ public class RNSnapchatLoginModule extends ReactContextBaseJavaModule {
     return "RNSnapchatLogin";
   }
   @ReactMethod
-  public void setToken(String accessToken) {
-    // SnapLogin.getAuthTokenManager(getReactApplicationContext()).setAccessToken(accessToken);
-    //promise.resolve(null);
+  public void setToken(String accessToken, Promise promise) {
+    // try{
+    //   SnapLogin.getAuthTokenManager(getReactApplicationContext()).setAccessToken(accessToken);
+    //   promise.resolve(true);
+    // }
+    // catch(Exception e){
+    //   Log.d("RNSnapchatLogin set token",e.toString());
+    //   promise.resolve(false);
+    // }
 
 }
-  @ReactMethod
-	public void snapOnClick(final Promise promise) {
-    final WritableMap map = Arguments.createMap(); 
-		try {
-      // Add the LoginStateChangedListener you’ve defined to receive LoginInState updates
-      SnapLogin.getAuthTokenManager(getReactApplicationContext()).startTokenGrant();
-      // SnapLogin.getLoginStateController(getReactApplicationContext()).addOnLoginStateChangedListener(mLoginStateChangedListener);
-//       String query = "{me{bitmoji{avtar},displayName}}";
-//         String var = null;  // check the next line null if val is to be replaced somehow
-//         try{
-//         SnapLogin.fetchUserData(getReactApplicationContext(), query, null, new FetchUserDataCallback() {
-//             @Override
-//             public void onSuccess(@Nullable UserDataResponse userDataResponse) {
-//                 if(userDataResponse==null || userDataResponse.getData() == null)
-//                 {
-//                   map.putString("snaponclick","response null" );
-//                   promise.resolve(map); 
-//                 }
 
-//                 MeData meData = userDataResponse.getData().getMe();
-//                 if(meData==null)
-//                 {
-//                   map.putString("snaponclick","data null" );
-//                   promise.resolve(map); 
-//                 }
-//                 map.putString("snaponclick", userDataResponse.getData().getMe().getDisplayName());
-//                 promise.resolve(map); 
-                
-//             }
-
-//             @Override
-//             public void onFailure(boolean b, int i) {
-//               map.putString("snaponclick","failure");
-//                 promise.resolve(map); 
-//             }
-// });
-//         }catch(Exception e){
-//           map.putString("snaponclick", e.toString());
-//         }
-      map.putString("snaponclick", "sucess");
-      promise.resolve(map); 
-
-    } catch (Exception e) {
-      map.putString("snaponclick", e.toString());
-                          
-      promise.resolve(map);     
-    }
-  }
   @ReactMethod
   public void fetchUserData(final Promise promise) {
     String query = "{me{bitmoji{avtar},displayName}}";//"{me{displayName}}";
     String variables = null;
-    Log.w("inside fech user",Boolean.toString(SnapLogin.isUserLoggedIn(this.reactContext)));
+    Log.d("assd","inside fetch userdata");
+    Log.d("inside fech user",Boolean.toString(SnapLogin.isUserLoggedIn(this.reactContext)));
     if(SnapLogin.isUserLoggedIn(getReactApplicationContext()))
       {
         SnapLogin.fetchUserData(getReactApplicationContext(),"{me{displayName}}",null,new FetchUserDataCallback() {
               @Override
               public void onSuccess(@Nullable UserDataResponse userDataResponse) {
-                Log.w("assd","CODEEEEEEEEEEEEEEEE");
+                Log.d("assd","CODEEEEEEEEEEEEEEEE");
                 if (userDataResponse == null || userDataResponse.getData() == null) {
+                  Log.w("assd","null");
                   return;
                 }
 
                 MeData meData = userDataResponse.getData().getMe();
                 if (meData == null) {
+                  Log.w("assd","null");
                   return;
                 }
 
@@ -233,19 +146,25 @@ public class RNSnapchatLoginModule extends ReactContextBaseJavaModule {
     
 } 
 @ReactMethod
-  public void AddStartLogin() {
+  public void AddStartLogin(Promise promise) {
+    try{
     final LoginStateController.OnLoginStartListener mLoginStartListener =
             new LoginStateController.OnLoginStartListener() {
               @Override
               public void onLoginStart() {
-                Log.w("NETTWORKKKKKKKKKKKk","starting di dong");
+                Log.d("NETTWORKKKKKKKKKKKk","starting di dong");
 
                 sendEvent(getReactApplicationContext(), "Login Start", null);
               }
             };
 
     SnapLogin.getLoginStateController(getReactApplicationContext()).addOnLoginStartListener(mLoginStartListener);
-}
+    promise.resolve(true);
+  }catch(Exception e){
+    Log.d("AddStartLogin exception snapchat",e.toString());
+    promise.resolve(false);
+          }
+  }
   @ReactMethod
   public void snapFetch(final Promise promise){
    
@@ -261,5 +180,4 @@ public class RNSnapchatLoginModule extends ReactContextBaseJavaModule {
 
   }
 }
-
 
