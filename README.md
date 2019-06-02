@@ -3,7 +3,7 @@
 
 ## Getting started
 
-`$ npm install react-native-snapchat-login --save`
+`$ npm install git+https://git@github.com/VadakkekaraApps/snapchat-login.git --save`
 
 ### Mostly automatic installation
 
